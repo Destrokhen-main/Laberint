@@ -40,8 +40,8 @@ function finish(){
     else if (start.y == h-2) map[start.y+1][start.x].left = false;
 }
 
-var w = 100;
-var h = 100;
+var w = 50;
+var h = 50;
 
 var map = create_map(h,w);
 create_lab();
