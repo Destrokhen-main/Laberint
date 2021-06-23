@@ -10,6 +10,7 @@ function create_map(w,h){
                 y       : y,
                 x       : x,
                 distans : 0,
+                player  : false
             });
         }
         map.push(a);
@@ -40,13 +41,78 @@ function finish(){
     else if (start.y == h-2) map[start.y+1][start.x].left = false;
 }
 
-var w = 50;
-var h = 50;
+var w = 20;
+var h = 20;
 
 var map = create_map(h,w);
+map[0][0].player = true;
+
+var current_player = map[0][0];
+
 create_lab();
 finish();
 draw_map();
+
+
+function check_wall(cx,cy,y,x){
+    if (x == 1 && map[cy][cx+1].left == false)
+        return true;
+    else if (x == -1 && map[cy][cx].left == false)
+        return true;
+    else if (y == 1 && map[cy][cx].bottom == false)
+        return true;
+    else if (y == -1 && map[cy-1][cx].bottom == false)
+        return true;
+}
+
+window.addEventListener('keydown', function(e){
+    let cx = current_player.x;
+    let cy = current_player.y;
+    let x;
+    let y;
+    if(e.key == "w") {
+        x = 0;
+        y = -1;
+    } else if (e.key == "a") {
+        y = 0;
+        x = -1;
+    } else if (e.key == "d") {
+        y = 0;
+        x = 1;
+    } else if (e.key == "s") {
+        x = 0;
+        y = 1;
+    }
+
+    if(x == 1 && cx+1 < w) {
+        if(check_wall(cx,cy,y,x)) {
+            map[cy][cx].player = false
+            map[cy][cx+1].player = true;
+            current_player = map[cy][cx+1];
+        }
+    } else if (x == -1 && cx-1 >= 0) {
+        if(check_wall(cx,cy,y,x)) {
+            map[cy][cx].player = false
+            map[cy][cx-1].player = true;
+            current_player = map[cy][cx-1];
+        }
+    } else if (y == 1 && cy+1 < h) {
+        if(check_wall(cx,cy,y,x)) {
+            map[cy][cx].player = false
+            map[cy+1][cx].player = true;
+            current_player = map[cy+1][cx];
+        }
+    } else if (y == -1 && cy-1 < h) {
+        if(check_wall(cx,cy,y,x)) {
+            map[cy][cx].player = false
+            map[cy-1][cx].player = true;
+            current_player = map[cy-1][cx];
+        }
+    }
+
+    draw_map();
+})
+
 
 function remwall(a,b) {
     if(a.x == b.x) {
@@ -112,8 +178,17 @@ function draw_map(){
 
             if(map[y][x].bottom == true) td.style.borderBottom = "1px solid black";
 
+            if(map[y][x].player == true)
+                td.innerText = "@";
+            else {
+                td.innerText = "@";
+                td.style.color = "white";
+            }
+
             tr.appendChild(td);
         }
         object.appendChild(tr);
     }
 }
+
+
