@@ -10,7 +10,9 @@ function create_map(w,h){
                 y       : y,
                 x       : x,
                 distans : 0,
-                player  : false
+                player  : false,
+                way     : false,
+                finall  : false,
             });
         }
         map.push(a);
@@ -39,10 +41,13 @@ function finish(){
     else if (start.y == 0) map[start.y][start.x].bottom = false;
     else if (start.x == w-2) map[start.y][start.x+1].left = false;
     else if (start.y == h-2) map[start.y+1][start.x].left = false;
+
+    start.finall = true;
 }
 
 var w = 20;
 var h = 20;
+var show_map = false;
 
 var map = create_map(h,w);
 map[0][0].player = true;
@@ -86,30 +91,38 @@ window.addEventListener('keydown', function(e){
 
     if(x == 1 && cx+1 < w) {
         if(check_wall(cx,cy,y,x)) {
-            map[cy][cx].player = false
+            map[cy][cx].player = false;
+            map[cy][cx].way     = true;
             map[cy][cx+1].player = true;
             current_player = map[cy][cx+1];
         }
     } else if (x == -1 && cx-1 >= 0) {
         if(check_wall(cx,cy,y,x)) {
-            map[cy][cx].player = false
+            map[cy][cx].player  = false
+            map[cy][cx].way     = true;
             map[cy][cx-1].player = true;
             current_player = map[cy][cx-1];
         }
     } else if (y == 1 && cy+1 < h) {
         if(check_wall(cx,cy,y,x)) {
             map[cy][cx].player = false
+            map[cy][cx].way     = true;
             map[cy+1][cx].player = true;
             current_player = map[cy+1][cx];
         }
     } else if (y == -1 && cy-1 < h) {
         if(check_wall(cx,cy,y,x)) {
-            map[cy][cx].player = false
+            map[cy][cx].player = false;
+            map[cy][cx].way     = true;
             map[cy-1][cx].player = true;
             current_player = map[cy-1][cx];
         }
     }
 
+    if(current_player.finall == true) {
+        alert('Отлично, ты прошёл');
+        location.reload();
+    }
     draw_map();
 })
 
@@ -178,11 +191,15 @@ function draw_map(){
 
             if(map[y][x].bottom == true) td.style.borderBottom = "1px solid black";
 
-            if(map[y][x].player == true)
+            if(map[y][x].player == true) {
                 td.innerText = "@";
-            else {
+            } else {
                 td.innerText = "@";
                 td.style.color = "white";
+            }
+
+            if(map[y][x].way == true && map[y][x].player == false) {
+                if(show_map) td.style.color = "green";
             }
 
             tr.appendChild(td);
@@ -191,4 +208,18 @@ function draw_map(){
     }
 }
 
+
+document.getElementById('show').addEventListener('click',function(e){
+    let element = document.getElementById('show');
+    if(element.getAttribute('tg') == 0){
+        element.setAttribute('tg','1');
+        element.innerText = "Скрыть путь";
+        show_map = true;
+    } else {
+        element.setAttribute('tg','0');
+        element.innerText = "Показать путь";
+        show_map = false;
+    }
+
+});
 
